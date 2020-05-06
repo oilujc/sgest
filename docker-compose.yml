@@ -1,0 +1,29 @@
+version: '3'
+services:
+    db:
+        container_name: girosapp_db
+        image: postgres:latest
+        restart: always
+        environment:
+            POSTGRES_USER: ${PG_USER}
+            POSTGRES_PASSWORD: ${PG_PASSWORD}
+            POSTGRES_DB: ${PG_NAME}
+            PGDATA: /var/lib/postgresql/data/pgdata
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./data/postgres/pgdata:/var/lib/postgresql/data/pgdata
+    app:
+        build: .
+        image: hakase-labs/laravel
+        container_name: app
+        restart: unless-stopped
+        tty: true
+        environment:
+            SERVICE_NAME: app
+            SERVICE_TAGS: dev
+        working_dir: /var/www/html
+        volumes:
+            - ./:/var/www/html
+        depends_on:
+            - db
